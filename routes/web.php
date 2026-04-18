@@ -10,6 +10,50 @@ use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\MultiplayerController;
 use App\Http\Controllers\RulesController;
 
+
+
+Route::post('/auth/wallet', function (\Illuminate\Http\Request $request) {
+
+    $wallet = $request->wallet;
+
+    if (!$wallet) {
+        return response()->json(['error' => 'No wallet'], 400);
+    }
+
+    // Find or create user
+    $user = \App\Models\User::where('wallet_address', $wallet)->first();
+
+    if (!$user) {
+        $user = \App\Models\User::create([
+            'name' => 'User_' . substr($wallet, 0, 6),
+            'email' => $wallet . '@wallet.local', // dummy
+            'password' => bcrypt(str()->random(16)),
+            'wallet_address' => $wallet
+        ]);
+
+        \App\Models\Profile::create([
+            'user_id' => $user->id,
+            'level' => 'amateur',
+            'lifelines' => 5,
+            'score' => 0,
+            'round' => 1
+        ]);
+    }
+
+    auth()->login($user);
+
+    return response()->json(['success' => true]);
+});
+
+
+Route::post('/disconnect-wallet', function () {
+
+    auth()->logout();
+
+    return response()->json(['success' => true]);
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | Public Route

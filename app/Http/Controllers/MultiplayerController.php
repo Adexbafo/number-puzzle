@@ -9,17 +9,31 @@ use App\Services\GameService;
 class MultiplayerController extends Controller
 {
     public function index()
-    {
-        $matches = GameMatch::where('status', 'waiting')->get();
+{
+    $matches = GameMatch::whereIn('status', ['waiting', 'active'])
+        ->latest()
+        ->get();
 
-        return view('multiplayer.lobby', compact('matches'));
-    }
+    return view('multiplayer.lobby', compact('matches'));
+}
 
     public function create(Request $request)
     {
         $request->validate([
-            'stake' => 'required|numeric|min:1'
+            'stake' => 'required|numeric|min:0'
         ]);
+
+        // Prevent duplicate matches
+        $existing = GameMatch::where(function ($q) {
+            $q->where('player_one', auth()->id())
+              ->orWhere('player_two', auth()->id());
+        })
+        ->whereIn('status', ['waiting', 'active'])
+        ->first();
+
+        if ($existing) {
+            return back()->with('error', 'You already have an active match!');
+        }
 
         GameMatch::create([
             'player_one' => auth()->id(),
@@ -27,16 +41,12 @@ class MultiplayerController extends Controller
             'status' => 'waiting'
         ]);
 
-        return redirect('/multiplayer');
+        return back()->with('success', 'Match created!');
     }
 
     public function join($id)
     {
         $match = GameMatch::findOrFail($id);
-
-        if ($match->player_one == auth()->id()) {
-            return back()->with('error', 'You cannot join your own match');
-        }
 
         if ($match->player_two) {
             return back()->with('error', 'Match already full');
@@ -48,31 +58,37 @@ class MultiplayerController extends Controller
             'started_at' => now()
         ]);
 
-        return redirect('/multiplayer/match/' . $match->id);
+        return redirect()->route('mp.play', $match->id);
     }
 
     public function play($id, GameService $service)
     {
         $match = GameMatch::findOrFail($id);
 
-        if (!in_array(auth()->id(), [$match->player_one, $match->player_two])) {
-            abort(403);
-        }
-
         if ($match->status !== 'active') {
-            return redirect('/multiplayer');
+            return view('multiplayer.play', [
+                'match' => $match,
+                'q' => null
+            ]);
         }
 
-        if (!session()->has('mp_question')) {
+        if (!$match->current_question && 
+            !$match->player_one_answered && 
+            !$match->player_two_answered) {
+
             $question = $service->generateQuestion();
 
-            session([
-                'mp_question' => $question,
-                'mp_answer' => $question['answer'],
-                'mp_started_at' => now()
-            ]);
+            $match->current_question = json_encode($question);
+            $match->save();
+}
+
+        if (!$match->current_question) {
+            $question = $service->generateQuestion();
+
+            $match->current_question = json_encode($question);
+            $match->save();
         } else {
-            $question = session('mp_question');
+            $question = json_decode($match->current_question, true);
         }
 
         return view('multiplayer.play', [
@@ -82,48 +98,103 @@ class MultiplayerController extends Controller
     }
 
     public function submit(Request $request, $id)
-    {
-        $request->validate([
-            'answer' => 'required|numeric'
-        ]);
+{
+    $match = GameMatch::findOrFail($id);
 
-        $match = GameMatch::findOrFail($id);
+    $request->validate([
+        'answer' => 'required|numeric'
+    ]);
 
-        if (!in_array(auth()->id(), [$match->player_one, $match->player_two])) {
-            abort(403);
-        }
+    $question = json_decode($match->current_question, true);
 
-        $correct = session('mp_answer');
-
-        if (!$correct) {
-            return redirect('/multiplayer');
-        }
-
-        if (now()->diffInSeconds(session('mp_started_at')) > 20) {
-            return $this->loseMatch($match);
-        }
-
-        if ($request->answer != $correct) {
-            return $this->loseMatch($match);
-        }
-
-        return redirect()->back();
+    if (!$question) {
+        return back()->with('error', 'No question found');
     }
 
-    private function loseMatch($match)
-    {
-        $userId = auth()->id();
+    $correct = $question['answer'];
+    $isPlayerOne = auth()->id() == $match->player_one;
 
-        $winner = ($match->player_one == $userId)
-            ? $match->player_two
-            : $match->player_one;
+    // ✅ MARK PLAYER AS ANSWERED
+    if ($isPlayerOne) {
+        if ($match->player_one_answered) {
+            return back()->with('error', 'Already answered');
+        }
 
-        $match->update([
-            'status' => 'finished',
-            'winner' => $winner,
-            'ended_at' => now()
-        ]);
+        $match->player_one_answered = true;
 
-        return redirect('/multiplayer')->with('success', 'Match ended');
+        if ($request->answer == $correct) {
+            $match->player_one_score += 10;
+            session()->flash('success', 'Correct!');
+        } else {
+            session()->flash('error', 'Wrong!');
+        }
+
+    } else {
+        if ($match->player_two_answered) {
+            return back()->with('error', 'Already answered');
+        }
+
+        $match->player_two_answered = true;
+
+        if ($request->answer == $correct) {
+            $match->player_two_score += 10;
+            session()->flash('success', 'Correct!');
+        } else {
+            session()->flash('error', 'Wrong!');
+        }
     }
+
+    // 🔥 ONLY MOVE WHEN BOTH PLAYERS ANSWERED
+    if ($match->player_one_answered && $match->player_two_answered) {
+
+        $match->question_number++;
+
+        if ($match->question_number > 8) {
+            $match->round++;
+            $match->question_number = 1;
+        }
+
+        // RESET FOR NEXT QUESTION
+        $match->player_one_answered = false;
+        $match->player_two_answered = false;
+
+        $match->current_question = null;
+    }
+
+    // 🔥 END GAME
+    if ($match->round > 5) {
+        $this->decideWinner($match);
+        return redirect()->route('mp.index')->with('success', 'Match finished!');
+    }
+
+    $match->save();
+
+    return redirect()->route('mp.play', $match->id);
+}
+
+    private function decideWinner($match)
+{
+    if ($match->player_one_score > $match->player_two_score) {
+        $match->winner = $match->player_one;
+    } elseif ($match->player_two_score > $match->player_one_score) {
+        $match->winner = $match->player_two;
+    } else {
+        $match->winner = null;
+    }
+
+    $match->status = 'finished';
+    $match->ended_at = now();
+
+    // 💰 PAYOUT (SIMULATION)
+    if ($match->winner) {
+        $winnerProfile = \App\Models\Profile::where('user_id', $match->winner)->first();
+
+        if ($winnerProfile) {
+            $winnerProfile->score += ($match->stake * 2); // winner takes all
+            $winnerProfile->save();
+        }
+    }
+
+    $match->save();
+}
 }
