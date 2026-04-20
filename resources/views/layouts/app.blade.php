@@ -7,64 +7,35 @@
 
         <title>{{ config('app.name', 'NumberPuzzle') }}</title>
 
-        <style>
-
-.shake {
-    animation: shake 0.3s;
-}
-
-@keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0); }
-}
-
-.glow {
-    animation: glow 0.5s ease-in-out;
-}
-
-@keyframes glow {
-    from { box-shadow: 0 0 0px green; }
-    to { box-shadow: 0 0 15px green; }
-}
-
-
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-    @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-       </style>
-
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <style>
+            body {
+                font-family: 'Outfit', sans-serif;
+            }
+        </style>
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+    <body class="font-sans antialiased text-slate-100 min-h-screen flex flex-col">
+        <!-- Optional Navigation can go here if needed -->
+        
+        <!-- Page Heading -->
+        @isset($header)
+            <header class="glass-dark border-b border-white/10 z-10 relative">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    {{ $header }}
+                </div>
+            </header>
+        @endisset
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
-
-            <!-- Page Content -->
-            <main class="flex-1 p-4">
-              @yield('content')
-            </main>
-        </div>
+        <!-- Page Content -->
+        <main class="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col z-0 relative">
+            @yield('content')
+        </main>
     </body>
 </html>
