@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ config('app.name', 'NumberPuzzle') }} - The Ultimate Brain Teaser</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,25 +34,13 @@
                     <span class="text-xl font-bold tracking-tight text-white">NumberPuzzle</span>
                 </div>
                 
-                @if (Route::has('login'))
+                @auth
                     <nav class="flex gap-4">
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="glass-card px-5 py-2 rounded-full text-sm font-semibold hover:text-white hover:bg-white/20 transition-all">
-                                Dashboard
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}" class="px-5 py-2 rounded-full text-sm font-semibold text-slate-300 hover:text-white transition-colors">
-                                Log in
-                            </a>
-
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="bg-white text-slate-900 px-5 py-2 rounded-full text-sm font-bold hover:bg-slate-200 transition-colors shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:shadow-[0_0_25px_rgba(255,255,255,0.4)]">
-                                    Play Now
-                                </a>
-                            @endif
-                        @endauth
+                        <a href="{{ url('/dashboard') }}" class="glass-card px-5 py-2 rounded-full text-sm font-semibold hover:text-white hover:bg-white/20 transition-all">
+                            Dashboard
+                        </a>
                     </nav>
-                @endif
+                @endauth
             </header>
 
             <!-- Hero Section -->
@@ -76,10 +65,10 @@
                             Enter Dashboard
                         </a>
                     @else
-                        <a href="{{ route('register') }}" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-2xl font-bold text-lg shadow-[0_0_30px_rgba(147,51,234,0.4)] hover:shadow-[0_0_40px_rgba(147,51,234,0.6)] hover:-translate-y-1 transition-all duration-300">
-                            Start Playing Free
-                        </a>
-                        <a href="{{ route('rules') }}" class="w-full sm:w-auto px-8 py-4 glass-card text-white rounded-2xl font-bold text-lg hover:-translate-y-1 transition-all duration-300">
+                        <button id="connect-btn" onclick="loginWithWallet()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-2xl font-bold text-lg shadow-[0_0_30px_rgba(147,51,234,0.4)] hover:shadow-[0_0_40px_rgba(147,51,234,0.6)] hover:-translate-y-1 transition-all duration-300">
+                            Connect Wallet to Play
+                        </button>
+                        <a href="{{ route('rules') }}" class="w-full sm:w-auto px-8 py-4 glass-card text-white rounded-2xl font-bold text-lg hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
                             How to Play
                         </a>
                     @endauth
@@ -102,5 +91,54 @@
             </main>
         </div>
 
+        <script>
+        async function loginWithWallet() {
+            const btn = document.getElementById('connect-btn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Connecting...';
+            btn.disabled = true;
+
+            try {
+                if (typeof window.ethereum !== 'undefined') {
+                    console.log('Ethereum provider detected.');
+                    
+                    const accounts = await window.ethereum.request({
+                        method: 'eth_requestAccounts'
+                    });
+
+                    const wallet = accounts[0];
+                    console.log('Connected wallet:', wallet);
+
+                    const response = await fetch('/auth/wallet', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ wallet })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        window.location.href = '/dashboard';
+                    } else {
+                        alert('Failed to log in on the server: ' + (data.error || 'Unknown error'));
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }
+                } else {
+                    alert('No Web3 wallet (like MetaMask or Rabby) found. Please ensure your extension is enabled.');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error("User rejected request or error occurred", error);
+                alert("Connection failed: " + error.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+        </script>
     </body>
 </html>
