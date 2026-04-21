@@ -12,6 +12,8 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
+        <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+        
         <style>
             body { font-family: 'Outfit', sans-serif; }
         </style>
@@ -27,12 +29,12 @@
         <div class="relative z-10 flex flex-col min-h-screen">
             <!-- Navbar -->
             <header class="w-full max-w-7xl mx-auto px-6 py-6 flex justify-between items-center fade-in-up">
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                <a href="{{ url('/') }}" class="flex items-center gap-3 group">
+                    <div class="w-12 h-12 rounded-xl bg-slate-900/50 border border-white/10 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-300">
+                        <img src="{{ asset('logo.png') }}" alt="NumberPuzzle Logo" class="w-10 h-10 object-contain">
                     </div>
-                    <span class="text-xl font-bold tracking-tight text-white">NumberPuzzle</span>
-                </div>
+                    <span class="text-2xl font-black tracking-tighter text-white group-hover:text-purple-400 transition-colors">Number<span class="text-slate-400">Puzzle</span></span>
+                </a>
                 
                 @auth
                     <nav class="flex gap-4">

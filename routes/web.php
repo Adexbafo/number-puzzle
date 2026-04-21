@@ -10,14 +10,17 @@ use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\MultiplayerController;
 use App\Http\Controllers\RulesController;
 
+/*
+|--------------------------------------------------------------------------
+| Wallet Connect (NO AUTH REQUIRED)
+|--------------------------------------------------------------------------
+*/
+Route::post('/auth/wallet', function (Request $request) {
 
-
-Route::post('/auth/wallet', function (\Illuminate\Http\Request $request) {
-
-    $wallet = $request->wallet;
+    $wallet = strtolower($request->wallet);
 
     if (!$wallet) {
-        return response()->json(['error' => 'No wallet'], 400);
+        return response()->json(['error' => 'Wallet required'], 400);
     }
 
     // Find or create user
@@ -26,46 +29,47 @@ Route::post('/auth/wallet', function (\Illuminate\Http\Request $request) {
     if (!$user) {
         $user = \App\Models\User::create([
             'name' => 'User_' . substr($wallet, 0, 6),
-            'email' => $wallet . '@wallet.local', // dummy
+            'email' => $wallet . '@wallet.local',
             'password' => bcrypt(str()->random(16)),
             'wallet_address' => $wallet
         ]);
 
-        \App\Models\Profile::create([
-            'user_id' => $user->id,
-            'level' => 'amateur',
-            'lifelines' => 5,
-            'score' => 0,
-            'round' => 1
-        ]);
+        $user->profile()->update(['wallet_address' => $wallet]);
     }
 
+    // Login user
     auth()->login($user);
 
-    return response()->json(['success' => true]);
+    return response()->json([
+        'success' => true,
+        'wallet' => $wallet
+    ]);
 });
-
-
-Route::post('/disconnect-wallet', function () {
-
-    auth()->logout();
-
-    return response()->json(['success' => true]);
-});
-
 
 /*
 |--------------------------------------------------------------------------
-| Public Route
+| Disconnect Wallet
+|--------------------------------------------------------------------------
+*/
+Route::post('/disconnect-wallet', function () {
+    auth()->logout();
+    return redirect('/');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/rules', [RulesController::class, 'index'])->name('rules');
+
 /*
 |--------------------------------------------------------------------------
-| Dashboard
+| Dashboard (Protected)
 |--------------------------------------------------------------------------
 */
 Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -78,19 +82,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
-
-    /*
-    |--------------------------------------------------------------------------
-    | Wallet Connection
-    |--------------------------------------------------------------------------
-    */
-    Route::post('/connect-wallet', function (Request $request) {
-        auth()->user()->profile->update([
-            'wallet_address' => $request->wallet
-        ]);
-
-        return response()->json(['success' => true]);
-    });
 
     /*
     |--------------------------------------------------------------------------
@@ -127,13 +118,6 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Rules
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/rules', [RulesController::class, 'index'])->name('rules');
-
-    /*
-    |--------------------------------------------------------------------------
     | Profile
     |--------------------------------------------------------------------------
     */
@@ -142,5 +126,3 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 });
-
-require __DIR__.'/auth.php';

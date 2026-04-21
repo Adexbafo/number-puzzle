@@ -23,3 +23,9 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/smart-contract/node_modules
+/artifacts
+/cache
+/smart-contract/cache
+/smart-contract/artifacts
+package.json.cjs-override

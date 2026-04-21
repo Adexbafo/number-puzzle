@@ -9,7 +9,7 @@
     <div class="flex items-center justify-between">
         <h2 class="text-3xl font-bold tracking-tight text-glow text-white">Dashboard</h2>
         
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ url('/disconnect-wallet') }}">
             @csrf
             <button class="px-4 py-2 rounded-full glass-card text-red-400 hover:text-red-300 hover:bg-red-500/10 text-sm font-semibold transition-all">
                 Disconnect
