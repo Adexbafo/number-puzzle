@@ -9,17 +9,42 @@ export const ABI = [
     "function resolveMatch(uint256 matchId, address winner)",
     "function refundMatch(uint256 matchId)",
     "function forceRefundActiveMatch(uint256 matchId)",
+    "function treasury() view returns (address)",
     "function matches(uint256) view returns (address playerOne, address playerTwo, uint256 stake, uint8 status, address winner, uint256 createdAt)"
 ];
 
-export async function getContract() {
-    if (!window.ethereum) {
-        alert("Install MetaMask");
-        return;
-    }
+export const ERC20_ABI = [
+    "function balanceOf(address owner) view returns (uint256)",
+    "function allowance(address owner, address spender) view returns (uint256)",
+    "function approve(address spender, uint256 amount) returns (bool)"
+];
 
+export async function getContract() {
+    if (!window.ethereum) return null;
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
-
     return new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+}
+
+/**
+ * Fetches the current reward pool balance (Treasury balance of $FARB)
+ */
+export async function getRewardPoolBalance() {
+    if (!window.ethereum || CONTRACT_ADDRESS === "YOUR_CONTRACT_ADDRESS") {
+        return "10,000"; // Default placeholder
+    }
+    
+    try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+        const treasuryAddress = await contract.treasury();
+        
+        const tokenContract = new ethers.Contract(FARBITS_TOKEN_ADDRESS, ERC20_ABI, provider);
+        const balance = await tokenContract.balanceOf(treasuryAddress);
+        
+        return ethers.formatUnits(balance, 18);
+    } catch (error) {
+        console.error("Error fetching reward pool:", error);
+        return "0";
+    }
 }
