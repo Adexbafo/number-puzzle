@@ -30,10 +30,9 @@ export default defineConfig({
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },
-  etherscan: {
-    apiKey: {
-      "base-sepolia": process.env.BASESCAN_API_KEY || "",
-      "base-mainnet": process.env.BASESCAN_API_KEY || "",
+  verify: {
+    etherscan: {
+      apiKey: process.env.BASESCAN_API_KEY || "",
     },
   },
 });
