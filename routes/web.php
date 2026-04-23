@@ -9,6 +9,8 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\MultiplayerController;
 use App\Http\Controllers\RulesController;
+use App\Http\Controllers\Auth\FarcasterAuthController;
+use App\Http\Controllers\FrameController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +47,12 @@ Route::post('/auth/wallet', function (Request $request) {
         'wallet' => $wallet
     ]);
 });
+
+Route::post('/auth/farcaster', [FarcasterAuthController::class, 'authenticate']);
+
+// Farcaster Frames
+Route::get('/f/{id}', [FrameController::class, 'show']);
+Route::post('/f/{id}/click', [FrameController::class, 'handleClick']);
 
 /*
 |--------------------------------------------------------------------------

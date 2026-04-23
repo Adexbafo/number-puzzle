@@ -12,6 +12,10 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
+        <!-- Farcaster Auth Kit (Vanilla JS Bundle) -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@farcaster/auth-kit@0.8.2/dist/styles.css">
+        <script src="https://cdn.jsdelivr.net/npm/@farcaster/auth-kit@0.8.2/dist/index.bundle.js"></script>
+        
         <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
         
         <style>
@@ -67,9 +71,19 @@
                             Enter Dashboard
                         </a>
                     @else
-                        <button id="connect-btn" onclick="loginWithWallet()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-2xl font-bold text-lg shadow-[0_0_30px_rgba(147,51,234,0.4)] hover:shadow-[0_0_40px_rgba(147,51,234,0.6)] hover:-translate-y-1 transition-all duration-300">
-                            Connect Wallet to Play
+                        <button id="connect-btn" onclick="loginWithWallet()" class="w-full sm:w-auto px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold text-lg border border-white/10 hover:-translate-y-1 transition-all duration-300">
+                            Connect Wallet
                         </button>
+
+                        <button id="farcaster-login-btn" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-2xl font-bold text-lg shadow-[0_0_30px_rgba(147,51,234,0.4)] hover:shadow-[0_0_40px_rgba(147,51,234,0.6)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 24C18.6274 24 24 18.6274 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 18.6274 5.37258 24 12 24Z" fill="#855DCD"/>
+                                <path d="M18.12 12.0624C18.12 14.8465 15.6105 17.1037 12.5161 17.1037C9.42163 17.1037 6.91211 14.8465 6.91211 12.0624C6.91211 9.27832 9.42163 7.0211 12.5161 7.0211C15.6105 7.0211 18.12 9.27832 18.12 12.0624Z" fill="white"/>
+                                <path d="M14.7451 12.0624C14.7451 13.0645 13.7476 13.8767 12.5161 13.8767C11.2846 13.8767 10.2871 13.0645 10.2871 12.0624C10.2871 11.0603 11.2846 10.2481 12.5161 10.2481C13.7476 10.2481 14.7451 11.0603 14.7451 12.0624Z" fill="#855DCD"/>
+                            </svg>
+                            Sign in with Farcaster
+                        </button>
+
                         <a href="{{ route('rules') }}" class="w-full sm:w-auto px-8 py-4 glass-card text-white rounded-2xl font-bold text-lg hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
                             How to Play
                         </a>
@@ -102,15 +116,11 @@
 
             try {
                 if (typeof window.ethereum !== 'undefined') {
-                    console.log('Ethereum provider detected.');
-                    
                     const accounts = await window.ethereum.request({
                         method: 'eth_requestAccounts'
                     });
 
                     const wallet = accounts[0];
-                    console.log('Connected wallet:', wallet);
-
                     const response = await fetch('/auth/wallet', {
                         method: 'POST',
                         headers: {
@@ -125,22 +135,64 @@
                     if (response.ok) {
                         window.location.href = '/dashboard';
                     } else {
-                        alert('Failed to log in on the server: ' + (data.error || 'Unknown error'));
+                        alert('Failed to log in: ' + (data.error || 'Unknown error'));
                         btn.innerText = originalText;
                         btn.disabled = false;
                     }
                 } else {
-                    alert('No Web3 wallet (like MetaMask or Rabby) found. Please ensure your extension is enabled.');
+                    alert('No Web3 wallet found.');
                     btn.innerText = originalText;
                     btn.disabled = false;
                 }
             } catch (error) {
-                console.error("User rejected request or error occurred", error);
                 alert("Connection failed: " + error.message);
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const fcButton = document.getElementById('farcaster-login-btn');
+            
+            // Farcaster Auth Kit from CDN exposes FarcasterAuthKit on window
+            const authKit = window.FarcasterAuthKit;
+
+            if (fcButton && authKit) {
+                const config = {
+                    relay: "https://relay.farcaster.xyz",
+                    rpcUrl: "https://mainnet.optimism.io",
+                    siweUri: window.location.origin + "/auth/farcaster",
+                    domain: window.location.hostname
+                };
+
+                fcButton.onclick = async () => {
+                    try {
+                        const { success, user } = await authKit.signIn(config);
+                        if (success && user) {
+                            console.log("Farcaster user:", user);
+                            
+                            const response = await fetch('/auth/farcaster', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify(user)
+                            });
+
+                            if (response.ok) {
+                                window.location.href = '/dashboard';
+                            } else {
+                                const err = await response.json();
+                                alert('Farcaster login failed: ' + (err.error || 'Unknown error'));
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Farcaster sign-in error:", error);
+                    }
+                };
+            }
+        });
         </script>
     </body>
 </html>

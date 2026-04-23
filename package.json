@@ -38,7 +38,9 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
+        "@farcaster/auth-kit": "^0.8.2",
         "laravel-echo": "^2.3.4",
-        "pusher-js": "^8.5.0"
+        "pusher-js": "^8.5.0",
+        "viem": "^2.48.4"
     }
 }
