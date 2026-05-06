@@ -3,19 +3,22 @@ import Alpine from 'alpinejs';
 import sdk from '@farcaster/frame-sdk';
 
 window.Alpine = Alpine;
+window.farcaster = sdk;
+
 
 // Farcaster Frame Initialization
 const initFarcaster = async () => {
+    // Immediately signal ready to clear the splash screen
+    sdk.actions.ready();
+
     try {
         const context = await sdk.context;
         console.log('Farcaster Context:', context);
-        
-        // Signal to the Farcaster client that the app is ready
-        sdk.actions.ready();
     } catch (error) {
         console.error('Farcaster SDK initialization failed:', error);
     }
 };
+
 
 initFarcaster();
 Alpine.start();

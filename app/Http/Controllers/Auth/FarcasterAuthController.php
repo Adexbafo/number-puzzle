@@ -20,6 +20,7 @@ class FarcasterAuthController extends Controller
             'username' => 'nullable|string',
             'displayName' => 'nullable|string',
             'pfpUrl' => 'nullable|string',
+            'custodyAddress' => 'nullable|string',
             'verifications' => 'nullable|array', // Contains connected wallet addresses
         ]);
 
@@ -28,8 +29,11 @@ class FarcasterAuthController extends Controller
         $displayName = $data['displayName'] ?? $username;
         $pfpUrl = $data['pfpUrl'] ?? null;
         
-        // Use the first verified wallet address if available, or a fallback
+        // Use custodyAddress as primary wallet if verifications are empty
         $walletAddress = !empty($data['verifications']) ? strtolower($data['verifications'][0]) : null;
+        if (!$walletAddress && !empty($data['custodyAddress'])) {
+            $walletAddress = strtolower($data['custodyAddress']);
+        }
 
         // Find or create user by FID
         $user = User::where('farcaster_fid', $fid)->first();

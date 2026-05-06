@@ -50,18 +50,18 @@
             </header>
 
             <!-- Hero Section -->
-            <main class="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 w-full max-w-5xl mx-auto -mt-16">
+            <main class="flex-1 flex flex-col items-center justify-start pt-4 text-center px-4 sm:px-6 w-full max-w-5xl mx-auto">
                 
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-dark border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-widest mb-8 fade-in-up" style="animation-delay: 0.1s;">
-                    <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-dark border border-purple-500/30 text-purple-300 text-[10px] font-bold uppercase tracking-widest mb-6 fade-in-up" style="animation-delay: 0.1s;">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
                     Multiplayer Beta Live
                 </div>
 
-                <h1 class="text-5xl sm:text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500 tracking-tight mb-6 fade-in-up leading-tight" style="animation-delay: 0.2s;">
+                <h1 class="text-3xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500 tracking-tight mb-4 fade-in-up leading-tight" style="animation-delay: 0.2s;">
                     Crack the code.<br>Claim the <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">victory.</span>
                 </h1>
                 
-                <p class="mt-4 text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 fade-in-up font-medium" style="animation-delay: 0.3s;">
+                <p class="mt-2 text-sm sm:text-base text-slate-400 max-w-2xl mx-auto mb-8 fade-in-up font-medium" style="animation-delay: 0.3s;">
                     Test your logic, spot the patterns, and climb the global leaderboard. The ultimate sequence solving challenge awaits.
                 </p>
 
@@ -71,12 +71,12 @@
                             Enter Dashboard
                         </a>
                     @else
-                        <button id="connect-btn" onclick="loginWithWallet()" class="w-full sm:w-auto px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold text-lg border border-white/10 hover:-translate-y-1 transition-all duration-300">
+                        <button id="connect-btn" onclick="loginWithWallet()" class="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-base border border-white/10 hover:-translate-y-1 transition-all duration-300">
                             Connect Wallet
                         </button>
 
-                        <button id="farcaster-login-btn" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-2xl font-bold text-lg shadow-[0_0_30px_rgba(147,51,234,0.4)] hover:shadow-[0_0_40px_rgba(147,51,234,0.6)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <button id="farcaster-login-btn" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-xl font-bold text-base shadow-[0_0_30px_rgba(147,51,234,0.4)] hover:shadow-[0_0_40px_rgba(147,51,234,0.6)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 24C18.6274 24 24 18.6274 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 18.6274 5.37258 24 12 24Z" fill="#855DCD"/>
                                 <path d="M18.12 12.0624C18.12 14.8465 15.6105 17.1037 12.5161 17.1037C9.42163 17.1037 6.91211 14.8465 6.91211 12.0624C6.91211 9.27832 9.42163 7.0211 12.5161 7.0211C15.6105 7.0211 18.12 9.27832 18.12 12.0624Z" fill="white"/>
                                 <path d="M14.7451 12.0624C14.7451 13.0645 13.7476 13.8767 12.5161 13.8767C11.2846 13.8767 10.2871 13.0645 10.2871 12.0624C10.2871 11.0603 11.2846 10.2481 12.5161 10.2481C13.7476 10.2481 14.7451 11.0603 14.7451 12.0624Z" fill="#855DCD"/>
@@ -84,7 +84,7 @@
                             Sign in with Farcaster
                         </button>
 
-                        <a href="{{ route('rules') }}" class="w-full sm:w-auto px-8 py-4 glass-card text-white rounded-2xl font-bold text-lg hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
+                        <a href="{{ route('rules') }}" class="w-full sm:w-auto px-6 py-3 glass-card text-white rounded-xl font-bold text-base hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
                             How to Play
                         </a>
                     @endauth
@@ -114,12 +114,43 @@
             btn.innerText = 'Connecting...';
             btn.disabled = true;
 
-            try {
-                if (typeof window.ethereum !== 'undefined') {
-                    const accounts = await window.ethereum.request({
-                        method: 'eth_requestAccounts'
-                    });
+            console.log("Login with wallet initiated...");
 
+            try {
+                // Farcaster SDK Wallet Integration
+                if (window.farcaster && window.farcaster.wallet) {
+                    console.log("Farcaster SDK detected, attempting wallet connection...");
+                    try {
+                        const context = await window.farcaster.context;
+                        console.log("Farcaster Context found:", context);
+                        
+                        if (context && context.user) {
+                            const wallet = context.user.custodyAddress;
+                            console.log("Using custody address:", wallet);
+                            
+                            const response = await fetch('/auth/wallet', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({ wallet })
+                            });
+
+                            if (response.ok) {
+                                console.log("Login successful, redirecting...");
+                                window.location.href = '/dashboard';
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Farcaster SDK error:", e);
+                    }
+                }
+
+                console.log("Falling back to standard Web3 wallet...");
+                if (typeof window.ethereum !== 'undefined') {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     const wallet = accounts[0];
                     const response = await fetch('/auth/wallet', {
                         method: 'POST',
@@ -130,21 +161,21 @@
                         body: JSON.stringify({ wallet })
                     });
 
-                    const data = await response.json();
-
                     if (response.ok) {
                         window.location.href = '/dashboard';
                     } else {
-                        alert('Failed to log in: ' + (data.error || 'Unknown error'));
+                        const data = await response.json();
+                        alert('Login error: ' + (data.error || 'Unknown error'));
                         btn.innerText = originalText;
                         btn.disabled = false;
                     }
                 } else {
-                    alert('No Web3 wallet found.');
+                    alert('No wallet detected. If you are in Farcaster, ensure the SDK is loaded.');
                     btn.innerText = originalText;
                     btn.disabled = false;
                 }
             } catch (error) {
+                console.error("Full error:", error);
                 alert("Connection failed: " + error.message);
                 btn.innerText = originalText;
                 btn.disabled = false;
@@ -154,41 +185,85 @@
         document.addEventListener('DOMContentLoaded', () => {
             const fcButton = document.getElementById('farcaster-login-btn');
             
-            // Farcaster Auth Kit from CDN exposes FarcasterAuthKit on window
-            const authKit = window.FarcasterAuthKit;
-
-            if (fcButton && authKit) {
-                const config = {
-                    relay: "https://relay.farcaster.xyz",
-                    rpcUrl: "https://mainnet.optimism.io",
-                    siweUri: window.location.origin + "/auth/farcaster",
-                    domain: window.location.hostname
-                };
-
+            if (fcButton) {
                 fcButton.onclick = async () => {
-                    try {
-                        const { success, user } = await authKit.signIn(config);
-                        if (success && user) {
-                            console.log("Farcaster user:", user);
-                            
-                            const response = await fetch('/auth/farcaster', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                                },
-                                body: JSON.stringify(user)
-                            });
+                    const originalText = fcButton.innerHTML;
+                    fcButton.innerText = 'Verifying...';
+                    fcButton.disabled = true;
+                    
+                    console.log("Farcaster Login Button clicked...");
 
-                            if (response.ok) {
-                                window.location.href = '/dashboard';
+                    try {
+                        if (window.farcaster) {
+                            console.log("Fetching Farcaster Context...");
+                            const context = await window.farcaster.context;
+                            console.log("Context received:", context);
+                            
+                            if (context && context.user) {
+                                const response = await fetch('/auth/farcaster', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                    },
+                                    body: JSON.stringify({
+                                        fid: context.user.fid,
+                                        username: context.user.username,
+                                        displayName: context.user.displayName,
+                                        pfpUrl: context.user.pfpUrl,
+                                        custodyAddress: context.user.custodyAddress
+                                    })
+                                });
+
+                                if (response.ok) {
+                                    window.location.href = '/dashboard';
+                                    return;
+                                } else {
+                                    console.error("Backend login failed");
+                                }
                             } else {
-                                const err = await response.json();
-                                alert('Farcaster login failed: ' + (err.error || 'Unknown error'));
+                                console.warn("No Farcaster user in context. Are you logged into Warpcast?");
+                                alert("Please log in to Warpcast first.");
+                            }
+                        } else {
+                            console.warn("Farcaster SDK not found. Running in browser?");
+                        }
+
+                        // Fallback to Auth Kit
+                        const authKit = window.FarcasterAuthKit;
+                        if (authKit) {
+                            // ... existing auth kit logic ...
+                            const config = {
+                                relay: "https://relay.farcaster.xyz",
+                                rpcUrl: "https://mainnet.optimism.io",
+                                siweUri: window.location.origin + "/auth/farcaster",
+                                domain: window.location.hostname
+                            };
+                            const { success, user } = await authKit.signIn(config);
+                            if (success && user) {
+                                const response = await fetch('/auth/farcaster', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                    },
+                                    body: JSON.stringify(user)
+                                });
+
+                                if (response.ok) {
+                                    window.location.href = '/dashboard';
+                                    return;
+                                }
                             }
                         }
+                        
+                        fcButton.innerHTML = originalText;
+                        fcButton.disabled = false;
                     } catch (error) {
                         console.error("Farcaster sign-in error:", error);
+                        alert("Login failed. Check console for details.");
+                        fcButton.innerHTML = originalText;
+                        fcButton.disabled = false;
                     }
                 };
             }

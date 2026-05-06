@@ -8,7 +8,7 @@
         <title>{{ config('app.name', 'NumberPuzzle') }}</title>
 
         <!-- Farcaster Frame V2 Meta Tags -->
-        <meta property="fc:frame" content='{"version": "next", "imageUrl": "https://number-puzzle.adexmakai.com/logo.png", "button": {"title": "Play Now", "action": "launch_frame"}}' />
+        <meta property="fc:frame" content='{"version": "next", "imageUrl": "https://reveal-carmaker-goon.ngrok-free.dev/logo.png", "button": {"title": "Play Now", "action": "launch_frame"}}' />
 
 
         <!-- Fonts -->
@@ -27,8 +27,37 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased text-slate-100 min-h-screen flex flex-col">
-        <!-- Optional Navigation can go here if needed -->
+    <body class="font-sans antialiased text-slate-100 min-h-screen flex flex-col bg-slate-950">
+        <!-- Global Profile Navbar -->
+        <header class="w-full glass-dark border-b border-white/10 px-4 py-2.5 flex justify-between items-center z-50 sticky top-0 backdrop-blur-md">
+            <a href="{{ auth()->check() ? url('/dashboard') : url('/') }}" class="flex items-center gap-2 group">
+                <div class="w-7 h-7 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center group-hover:border-purple-500/50 transition-all">
+                    <img src="{{ asset('logo.png') }}" class="w-5 h-5 object-contain">
+                </div>
+                <span class="font-black text-xs tracking-tight uppercase text-slate-300">Number<span class="text-purple-400">Puzzle</span></span>
+            </a>
+            
+            @auth
+                <div class="flex items-center gap-3">
+                    <form action="{{ url('/disconnect-wallet') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="flex items-center gap-3 hover:opacity-80 transition-all cursor-pointer group/profile border-none bg-transparent p-0 m-0 outline-none">
+                            <div class="flex flex-col items-end">
+                                <span class="text-[10px] font-bold text-white leading-none">{{ Auth::user()->name }}</span>
+                                <span class="text-[8px] text-slate-500 uppercase tracking-tighter group-hover/profile:text-rose-400 transition-colors">Logout</span>
+                            </div>
+                            @if(Auth::user()->farcaster_pfp)
+                                <img src="{{ Auth::user()->farcaster_pfp }}" class="w-8 h-8 rounded-full border border-purple-500/30 shadow-lg shadow-purple-500/10 group-hover/profile:border-rose-500/50 transition-all">
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center text-xs font-bold text-slate-400 group-hover/profile:border-rose-500/50">
+                                    {{ substr(Auth::user()->name, 0, 1) }}
+                                </div>
+                            @endif
+                        </button>
+                    </form>
+                </div>
+            @endauth
+        </header>
         
         <!-- Page Heading -->
         @isset($header)

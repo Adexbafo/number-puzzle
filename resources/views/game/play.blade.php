@@ -18,7 +18,17 @@
     @endif
 
     {{-- Top Stats Bar --}}
-    <div class="glass p-5 rounded-3xl flex justify-between items-center text-white relative overflow-hidden">
+    <div class="flex items-center justify-between mb-4">
+        <a href="{{ url('/dashboard') }}" class="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Exit
+        </a>
+    </div>
+
+    <div class="glass p-3 rounded-2xl flex justify-between items-center text-white relative overflow-hidden">
+
         <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5"></div>
         
         <div class="relative z-10 text-center px-4">
@@ -75,10 +85,10 @@
         {{-- Question Box --}}
         <div 
             id="question-box"
-            class="text-center py-10 px-4 rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 shadow-inner mb-8 relative z-10 transition-all duration-300"
+            class="text-center py-6 px-4 rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 shadow-inner mb-6 relative z-10 transition-all duration-300"
         >
-            <p class="text-sm uppercase tracking-widest text-slate-400 font-semibold mb-4">Complete the sequence</p>
-            <h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 tracking-wider">
+            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-3">Complete the sequence</p>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 tracking-wider">
                 {{ $q['pattern'] }}
             </h2>
         </div>
@@ -100,7 +110,7 @@
                 >
             </div>
 
-            <button class="mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-lg py-4 px-8 rounded-2xl shadow-[0_0_20px_rgba(147,51,234,0.4)] hover:shadow-[0_0_30px_rgba(147,51,234,0.6)] transform hover:-translate-y-1 transition-all duration-300">
+            <button class="mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base py-3.5 px-8 rounded-xl shadow-[0_0_20px_rgba(147,51,234,0.4)] hover:shadow-[0_0_30px_rgba(147,51,234,0.6)] transform hover:-translate-y-1 transition-all duration-300">
                 Submit Answer
             </button>
         </form>

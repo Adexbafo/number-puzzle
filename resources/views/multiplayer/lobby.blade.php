@@ -6,7 +6,16 @@
 
     {{-- Hero/Title Section --}}
     <div class="text-center space-y-4 fade-in-up">
+        <div class="flex items-center justify-between mb-4">
+            <a href="{{ url('/dashboard') }}" class="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
         <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-white">
+
             Battle <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Lobby</span>
         </h2>
         <p class="text-slate-400 max-w-lg mx-auto">
