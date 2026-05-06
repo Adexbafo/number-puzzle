@@ -7,6 +7,10 @@
 
         <title>{{ config('app.name', 'NumberPuzzle') }}</title>
 
+        <!-- Farcaster Frame V2 Meta Tags -->
+        <meta property="fc:frame" content='{"version": "next", "imageUrl": "https://number-puzzle.adexmakai.com/logo.png", "button": {"title": "Play Now", "action": "launch_frame"}}' />
+
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -30,6 +30,7 @@
     },
     "dependencies": {
         "@farcaster/auth-kit": "^0.8.2",
+        "@farcaster/frame-sdk": "^0.0.64",
         "laravel-echo": "^2.3.4",
         "pusher-js": "^8.5.0",
         "viem": "^2.48.4"

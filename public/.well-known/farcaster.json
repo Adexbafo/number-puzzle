@@ -1,0 +1,17 @@
+{
+  "accountAssociation": {
+    "header": "eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ",
+    "payload": "eyJkb21haW4iOiJudW1iZXItcHV6emxlLmFkZXhtYWthaS5jb20ifQ",
+    "signature": "MHhiMzZiNzg1ZmZlZmJlYmNlMzk0MTYyZTFlYjFiZjBlMjI1YjA5YzY0MGI5YjBjNjI1ZWJlYjc4YmU5NjU0ZjExNjgxYmU5NjM0ZjExNjgxYmU5NjM0ZjExNjgxYmU5NjM0ZjExNjgxYmU5NjM0ZjExNjgxYmU5NjM0ZjEx"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Number Puzzle",
+    "iconUrl": "https://number-puzzle.adexmakai.com/favicon.png",
+    "homeUrl": "https://number-puzzle.adexmakai.com",
+    "imageUrl": "https://number-puzzle.adexmakai.com/logo.png",
+    "buttonTitle": "Play Number Puzzle",
+    "splashImageUrl": "https://number-puzzle.adexmakai.com/logo.png",
+    "splashBackgroundColor": "#0f172a"
+  }
+}
